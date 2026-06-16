@@ -12,6 +12,19 @@ export type ApprovalChannel = "telegram" | "slack" | "email";
 
 export type MediaKind = "live_video" | "video" | "audio" | "photo" | "pdf" | "docx" | "epub";
 
+export type PermissionKey =
+  | "*"
+  | "users.approve"
+  | "roles.assign"
+  | "calendar.edit"
+  | "media.publish"
+  | "archive.edit"
+  | "analytics.view"
+  | "payments.view"
+  | "site.draft"
+  | "site.publish"
+  | "plugins.configure";
+
 export interface UserProfile {
   id: string;
   fullName: string;
@@ -21,6 +34,32 @@ export interface UserProfile {
   verificationScore: number;
   sponsorUserIds: string[];
   createdAt: string;
+}
+
+export interface RoleClass {
+  id: string;
+  name: AccessLevel | "editor" | "super_admin";
+  permissions: PermissionKey[];
+  canDelegate: boolean;
+  editableSections?: string[];
+}
+
+export interface SiteSection {
+  id: string;
+  name: string;
+  route: string;
+  editableBy: string[];
+  status: "draft" | "review" | "published";
+  version: number;
+}
+
+export interface PluginIntegration {
+  id: string;
+  name: string;
+  capability: string;
+  status: "connected" | "ready" | "configurable" | "disabled" | "error";
+  requiredPermissions: PermissionKey[];
+  webhookUrl?: string;
 }
 
 export interface ApprovalDecision {
