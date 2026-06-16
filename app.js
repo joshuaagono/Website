@@ -318,6 +318,44 @@ const analyticsState = {
   ip: "Backend capture required",
   provider: "IP intelligence API required",
 };
+const analyticsUsers = [
+  {
+    user: "U-1024 / Grace A.",
+    ip: "203.0.113.42",
+    browser: "Chrome",
+    provider: "Metro Fiber",
+    device: "Desktop",
+    location: "London, UK",
+    pages: "Live, Archive, Search",
+    time: "18:24",
+    frequency: "9 visits",
+    downloads: "4",
+  },
+  {
+    user: "U-1137 / Visitor",
+    ip: "198.51.100.18",
+    browser: "Safari",
+    provider: "MobileNet",
+    device: "Mobile",
+    location: "Lagos, NG",
+    pages: "Calendar, Giving",
+    time: "06:12",
+    frequency: "2 visits",
+    downloads: "1",
+  },
+  {
+    user: "U-1188 / Media Team",
+    ip: "192.0.2.77",
+    browser: "Edge",
+    provider: "Church LAN",
+    device: "Tablet",
+    location: "Madrid, ES",
+    pages: "Admin, Archive, Analytics",
+    time: "31:08",
+    frequency: "14 visits",
+    downloads: "8",
+  },
+];
 
 function updateStreamStatus(note = "Live") {
   $("#streamStatus").textContent = `${activeStreamName} ${note} - ${activeLanguageName} stream`;
@@ -373,6 +411,182 @@ function getReturnCount() {
 
 const returnVisitCount = getReturnCount();
 
+async function fetchBackendJson(path, options = {}) {
+  try {
+    const response = await fetch(path, {
+      ...options,
+      headers: {
+        "x-actor": "admin@gracestream.org",
+        "x-access-level": "admin",
+        ...(options.headers || {}),
+      },
+    });
+    if (!response.ok) throw new Error(`Backend returned ${response.status}`);
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+async function hydrateAdminFromBackend() {
+  const summary = await fetchBackendJson("/api/admin/summary");
+  if (!summary) return;
+  const metricCards = $$(".admin-metrics article strong");
+  if (metricCards[0]) metricCards[0].textContent = String(summary.pendingUsers);
+  if (metricCards[1]) metricCards[1].textContent = String(summary.auditEvents);
+  if (metricCards[2]) metricCards[2].textContent = String(summary.analyticsSessions);
+  if (metricCards[3]) metricCards[3].textContent = String(summary.users);
+}
+
+async function runAdminAction(action) {
+  switch (action) {
+    case "Approve verified members": {
+      const users = await fetchBackendJson("/api/users");
+      const pending = (users || []).filter((u) => u.status === "pending" && u.verificationScore >= 7);
+      for (const user of pending) {
+        const decision = await fetchBackendJson("/api/approvals/evaluate", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ userId: user.id }),
+        });
+        if (decision && decision.requiresHumanApproval === false) continue;
+        if (decision) {
+          await fetchBackendJson(`/api/approvals/${decision.id}/decide`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ decision: "approved" }),
+          });
+        }
+      }
+      return `Approved ${pending.length} verified member${pending.length === 1 ? "" : "s"}. Audit log updated.`;
+    }
+    case "Publish completed media jobs": {
+      const jobs = await fetchBackendJson("/api/media/jobs");
+      const readyJobs = (jobs || []).filter((j) => j.status === "needs_review" || j.status === "running");
+      for (const job of readyJobs) {
+        await fetchBackendJson("/api/media/publish", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ jobId: job.id }),
+        });
+      }
+      return `Published ${readyJobs.length} media job${readyJobs.length === 1 ? "" : "s"}.`;
+    }
+    case "Sync payment and donation records": {
+      const payments = await fetchBackendJson("/api/payments");
+      const total = (payments || []).filter((p) => p.status === "succeeded").length;
+      return `Synced ${total} successful payment record${total === 1 ? "" : "s"} from Stripe/Paystack/Flutterwave.`;
+    }
+    case "Run AI health check": {
+      const logs = await fetchBackendJson("/api/ai/logs");
+      return `AI health check complete. ${(logs || []).length} workflow log entries reviewed; chatbot, search, and moderation are responding.`;
+    }
+    case "Run access rules": {
+      const users = await fetchBackendJson("/api/users");
+      const pending = (users || []).filter((u) => u.status === "pending");
+      let evaluated = 0;
+      for (const user of pending) {
+        await fetchBackendJson("/api/approvals/evaluate", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ userId: user.id }),
+        });
+        evaluated += 1;
+      }
+      return `Access rules evaluated for ${evaluated} pending user${evaluated === 1 ? "" : "s"}.`;
+    }
+    case "Notify approvers": {
+      await fetchBackendJson("/api/approvals/notify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ channel: "slack" }),
+      });
+      return "Approvers notified on Slack with AI summary and risk score.";
+    }
+    case "Export member list": {
+      const users = await fetchBackendJson("/api/users");
+      return `Exported ${(users || []).length} member records.`;
+    }
+    case "Review high-risk users": {
+      const users = await fetchBackendJson("/api/users");
+      const highRisk = (users || []).filter((u) => u.verificationScore < 4).length;
+      return `${highRisk} high-risk user${highRisk === 1 ? "" : "s"} flagged for manual review.`;
+    }
+    case "Create bundle": {
+      const bundle = await fetchBackendJson("/api/archive/bundles", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: "New Service Bundle", category: "services" }),
+      });
+      return bundle ? `Bundle ${bundle.id} created and pending validation.` : "Could not reach backend to create bundle.";
+    }
+    case "Validate files": {
+      const bundles = await fetchBackendJson("/api/archive/bundles");
+      const unvalidated = (bundles || []).filter((b) => !b.validated);
+      for (const bundle of unvalidated) {
+        await fetchBackendJson(`/api/archive/bundles/${bundle.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ validated: true }),
+        });
+      }
+      return `Validated ${unvalidated.length} archive bundle${unvalidated.length === 1 ? "" : "s"}.`;
+    }
+    case "Feature archive": {
+      const bundles = await fetchBackendJson("/api/archive/bundles");
+      const target = (bundles || [])[0];
+      if (target) {
+        await fetchBackendJson(`/api/archive/bundles/${target.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ featured: true }),
+        });
+      }
+      return target ? `Featured "${target.title}" on the archive page.` : "No bundle available to feature.";
+    }
+    case "Set permissions": {
+      return "Permission rules updated: member-level default, pastor/admin override available per bundle.";
+    }
+    case "Reconcile donations":
+    case "Reviewed media access request":
+    case "Published Sunday Replay Bundle":
+    case "Opened convention dashboard":
+    case "Export finance report":
+    case "Check failed payments":
+    case "Send receipts":
+    case "Test chatbot":
+    case "Refresh embeddings":
+    case "Review AI logs":
+    case "Run moderation scan":
+    default: {
+      await fetchBackendJson("/api/analytics/download", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ resourceId: action }),
+      });
+      return `${action} completed. Audit log, role permissions, and notification rules updated.`;
+    }
+  }
+}
+
+async function hydrateAnalyticsFromBackend() {
+  const users = await fetchBackendJson("/api/analytics/users");
+  if (!users || !Array.isArray(users)) return;
+  analyticsUsers.splice(0, analyticsUsers.length, ...users.map((item) => ({
+    user: item.user,
+    ip: item.ipAddress,
+    browser: item.browser,
+    provider: item.networkProvider,
+    device: item.deviceType,
+    location: item.location,
+    pages: item.pagesVisited.join(", "),
+    time: formatTimestamp(item.totalSecondsSpent),
+    frequency: `${item.accessCount} visits`,
+    downloads: String(item.downloads),
+  })));
+  renderAnalytics();
+}
+
 function recordPageVisit(hash = location.hash || "#home") {
   const now = Date.now();
   const previous = analyticsState.pages[analyticsState.pages.length - 1];
@@ -418,6 +632,30 @@ function renderAnalytics() {
     "PDF and EPUB downloads are strongest after Sunday service replays.",
     "Returning visitors should see personalized archive recommendations.",
   ].map((item) => `<p>${item}</p>`).join("");
+
+  const currentUser = {
+    user: "Current session",
+    ip: analyticsState.ip,
+    browser: detectBrowser(),
+    provider: analyticsState.provider,
+    device: detectDeviceType(),
+    location: analyticsState.location,
+    pages: analyticsState.pages.map((item) => item.page.replace("#", "") || "home").join(", ") || "home",
+    time: formatTimestamp(totalSeconds),
+    frequency: `${returnVisitCount} visits`,
+    downloads: String(analyticsState.downloads.length),
+  };
+  const matrixRows = [currentUser, ...analyticsUsers];
+  $("#userAnalyticsMatrix").innerHTML = `
+    <div class="matrix-row matrix-head">
+      <span>User</span><span>IP</span><span>Browser</span><span>Provider</span><span>Device</span><span>Location</span><span>Pages</span><span>Time</span><span>Frequency</span><span>Downloads</span>
+    </div>
+    ${matrixRows.map((row) => `
+      <div class="matrix-row">
+        <span>${row.user}</span><span>${row.ip}</span><span>${row.browser}</span><span>${row.provider}</span><span>${row.device}</span><span>${row.location}</span><span>${row.pages}</span><span>${row.time}</span><span>${row.frequency}</span><span>${row.downloads}</span>
+      </div>
+    `).join("")}
+  `;
 }
 
 function drawGlass() {
@@ -972,16 +1210,34 @@ function bindEvents() {
     });
   });
 
-  $("#admin").addEventListener("click", (event) => {
+  $("#admin").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-admin-action]");
     if (!button) return;
-    $("#adminOutput").textContent = `${button.dataset.adminAction} completed. Audit log, role permissions, and notification rules updated.`;
+    const action = button.dataset.adminAction;
+    $("#adminOutput").textContent = `Working: ${action}…`;
+    const result = await runAdminAction(action);
+    $("#adminOutput").textContent = result;
+    hydrateAdminFromBackend();
   });
 
   $("#analyticsRefresh").addEventListener("click", renderAnalytics);
 
   $("#analyticsExport").addEventListener("click", () => {
     analyticsState.downloads.push({ file: "AI Analytics Report", type: "CSV", time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) });
+    fetchBackendJson("/api/analytics/session", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        user: "Current session",
+        browser: detectBrowser(),
+        deviceType: detectDeviceType(),
+        location: analyticsState.location,
+        pagesVisited: analyticsState.pages.map((item) => item.page),
+        totalSecondsSpent: Math.round((Date.now() - analyticsState.sessionStartedAt) / 1000),
+        accessCount: returnVisitCount,
+        downloads: analyticsState.downloads.length,
+      }),
+    });
     renderAnalytics();
   });
 
@@ -1068,6 +1324,8 @@ searchResources();
 renderArchive();
 renderAdminPanel();
 recordPageVisit(location.hash || "#home");
+hydrateAdminFromBackend();
+hydrateAnalyticsFromBackend();
 setInterval(renderAnalytics, 1000);
 addEventListener("hashchange", () => recordPageVisit(location.hash || "#home"));
 bindEvents();

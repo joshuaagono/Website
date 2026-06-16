@@ -5,6 +5,7 @@
 - Language: TypeScript across frontend, backend, workers, and shared contracts.
 - Frontend: Next.js with React Server Components, Tailwind or a design system, and accessible UI primitives.
 - Backend: NestJS or Next.js API routes for smaller deployments; split into services as traffic grows.
+- Prototype backend: dependency-free Node HTTP server in `backend/server.js` with JSON persistence in `backend/db.json`.
 - Database: PostgreSQL with row-level security, Prisma or Drizzle, Redis for queues and caching.
 - Search: OpenSearch or Postgres full-text plus vector embeddings for PDF, DOCX, EPUB, transcripts, and images.
 - Media: Cloudflare Stream, Mux, AWS MediaConvert, or LiveKit depending on budget and live needs.
@@ -21,6 +22,7 @@
 2. Admin portal
    - Protected dashboard for users, access levels, approval queues, media jobs, archive bundles, streams, payments, integrations, and AI workflow logs.
    - Full audit trail for every approval, payment action, publishing action, and permission change.
+   - Custom backend routes power admin summary, users, audit logs, and analytics matrices.
 
 3. AI automation
    - Sermon summaries, clips, titles, tags, chapters, devotionals, and social posts.
@@ -67,6 +69,7 @@
    - Realtime location should use browser geolocation only after user consent; approximate IP location should be treated as lower confidence.
    - AI summaries can highlight engagement trends, repeat visitors, content demand, download behavior, and device/network quality issues.
    - Analytics must include retention limits, role-based access, consent records, and audit logs.
+   - User analytics matrix displays each user/session as a row with columns for IP, browser, provider, device, location, pages, time spent, frequency, and downloads.
 
 ## Production API Sketch
 
