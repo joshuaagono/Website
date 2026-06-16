@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccessClass {
+  GUEST
+  MEMBER
+  EDITOR
+  MEDIA_TEAM
+  FINANCE
+  PASTOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ResourceKind {
+  VIDEO
+  AUDIO
+  PDF
+  EPUB
+  PHOTO
+  DOCX
+}
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id             String             @id @default(cuid())
+  clerkId        String             @unique
+  email          String             @unique
+  name           String
+  accessClass    AccessClass         @default(MEMBER)
+  canAccessAdmin Boolean             @default(false)
+  phone          String?
+  ministry       String?
+  bio            String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  roles          UserRole[]
+  sessions       AnalyticsSession[]
+  downloads      DownloadEvent[]
+  donations      Donation[]
+  siteDrafts     SiteDraft[]
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String
+  canDelegate Boolean      @default(false)
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  label       String
+  roles       RolePermission[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model ArchiveBundle {
+  id          String         @id @default(cuid())
+  serialBase  String         @unique
+  title       String
+  category    String
+  preacher    String
+  serviceDate DateTime
+  description String
+  resources   Resource[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model Resource {
+  id              String         @id @default(cuid())
+  serial          String         @unique
+  kind            ResourceKind
+  title           String
+  preacher        String?
+  resourceDate    DateTime
+  description     String
+  storageUrl      String?
+  transcript      String?
+  extractedText   String?
+  archiveBundleId String?
+  archiveBundle   ArchiveBundle? @relation(fields: [archiveBundleId], references: [id], onDelete: SetNull)
+  downloads       DownloadEvent[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([kind])
+  @@index([resourceDate])
+  @@index([preacher])
+}
+
+model SiteSection {
+  id        String        @id @default(cuid())
+  key       String        @unique
+  title     String
+  body      String
+  status    PublishStatus @default(PUBLISHED)
+  drafts    SiteDraft[]
+  updatedAt DateTime      @updatedAt
+}
+
+model SiteDraft {
+  id            String        @id @default(cuid())
+  sectionId     String
+  authorId      String
+  content       Json
+  status        PublishStatus @default(DRAFT)
+  section       SiteSection   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+}
+
+model PluginIntegration {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  capability  String
+  status      String
+  config      Json?
+  webhookUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AnalyticsSession {
+  id                String          @id @default(cuid())
+  userId            String?
+  ipAddress         String?
+  browser           String
+  networkProvider   String?
+  deviceType        String
+  location          String?
+  pagesVisited      Json
+  totalSecondsSpent Int             @default(0)
+  accessCount       Int             @default(1)
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  downloads         DownloadEvent[]
+  createdAt         DateTime        @default(now())
+}
+
+model DownloadEvent {
+  id          String            @id @default(cuid())
+  userId      String?
+  resourceId  String?
+  sessionId   String?
+  kind        ResourceKind
+  fileName    String
+  user        User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  resource    Resource?         @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  session     AnalyticsSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  createdAt   DateTime          @default(now())
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  userId    String?
+  amount    Int
+  currency  String
+  fund      String
+  provider  String
+  status    String
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+}
