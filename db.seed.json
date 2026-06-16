@@ -1,0 +1,44 @@
+{
+  "users": [
+    { "id": "usr_001", "fullName": "Daniel Reed", "email": "daniel.reed@gracestream.org", "accessLevel": "pastor", "ministryInterests": ["preaching", "leadership"], "verificationScore": 9, "sponsorUserIds": [], "status": "active", "createdAt": "2026-01-12T09:00:00.000Z" },
+    { "id": "usr_002", "fullName": "Miriam Stone", "email": "miriam.stone@gracestream.org", "accessLevel": "worker", "ministryInterests": ["teaching", "membership"], "verificationScore": 8, "sponsorUserIds": ["usr_001"], "status": "active", "createdAt": "2026-02-03T09:00:00.000Z" },
+    { "id": "usr_003", "fullName": "Grace Adeyemi", "email": "grace.a@example.com", "accessLevel": "member", "ministryInterests": ["choir"], "verificationScore": 5, "sponsorUserIds": [], "status": "active", "createdAt": "2026-03-18T09:00:00.000Z" },
+    { "id": "usr_004", "fullName": "Tunde Bello", "email": "tunde.bello@example.com", "accessLevel": "guest", "ministryInterests": ["media team"], "verificationScore": 2, "sponsorUserIds": [], "status": "pending", "createdAt": "2026-06-10T14:20:00.000Z" },
+    { "id": "usr_005", "fullName": "Priya Nair", "email": "priya.nair@example.com", "accessLevel": "guest", "ministryInterests": ["finance team"], "verificationScore": 4, "sponsorUserIds": [], "status": "pending", "createdAt": "2026-06-12T11:05:00.000Z" },
+    { "id": "usr_006", "fullName": "Samuel Okoye", "email": "samuel.okoye@example.com", "accessLevel": "guest", "ministryInterests": ["ushering"], "verificationScore": 6, "sponsorUserIds": ["usr_002"], "status": "pending", "createdAt": "2026-06-14T08:45:00.000Z" }
+  ],
+  "approvals": [
+    { "id": "apr_001", "userId": "usr_004", "recommendedAccess": "media", "riskScore": 18, "reasons": ["Ministry interest: Media team", "Sponsor not yet attached"], "requiresHumanApproval": true, "notificationChannels": ["slack"], "status": "pending", "createdAt": "2026-06-10T14:21:00.000Z" },
+    { "id": "apr_002", "userId": "usr_005", "recommendedAccess": "finance", "riskScore": 42, "reasons": ["Ministry interest: Finance team", "Verification score below threshold"], "requiresHumanApproval": true, "notificationChannels": ["email", "telegram"], "status": "pending", "createdAt": "2026-06-12T11:06:00.000Z" },
+    { "id": "apr_003", "userId": "usr_006", "recommendedAccess": "worker", "riskScore": 12, "reasons": ["Sponsored by Miriam Stone", "Verification score above threshold"], "requiresHumanApproval": false, "notificationChannels": ["slack"], "status": "approved", "createdAt": "2026-06-14T08:46:00.000Z" }
+  ],
+  "mediaJobs": [
+    { "id": "job_001", "serviceId": "VID-2026-0621-HOPE", "title": "Sunday Service: The Power of Hope", "steps": ["detect_end", "transcode", "caption", "summarize", "publish", "notify"], "currentStepIndex": 6, "status": "published", "updatedAt": "2026-06-21T13:10:00.000Z" },
+    { "id": "job_002", "serviceId": "VID-2026-0814-FIRE", "title": "Convention Night Two Replay", "steps": ["detect_end", "transcode", "caption", "summarize", "publish", "notify"], "currentStepIndex": 3, "status": "needs_review", "updatedAt": "2026-06-15T20:40:00.000Z" },
+    { "id": "job_003", "serviceId": "AUD-2026-0610-PRAY", "title": "Midweek Prayer: Healing and Direction", "steps": ["detect_end", "transcode", "caption", "summarize", "publish", "notify"], "currentStepIndex": 2, "status": "running", "updatedAt": "2026-06-16T07:15:00.000Z" }
+  ],
+  "archiveBundles": [
+    { "id": "ARC-2026-0621-HOPE", "title": "Sunday Service: The Power of Hope", "category": "services", "featured": true, "permissions": "member", "validated": true },
+    { "id": "ARC-2026-0814-FIRE", "title": "Convention Night Two Replay", "category": "conventions", "featured": false, "permissions": "guest", "validated": false }
+  ],
+  "payments": [
+    { "id": "pay_001", "kind": "donation", "fund": "missions", "amountMinor": 5000, "currency": "USD", "provider": "stripe", "status": "succeeded", "createdAt": "2026-06-14T10:00:00.000Z" },
+    { "id": "pay_002", "kind": "donation", "fund": "tithe", "amountMinor": 12000, "currency": "GBP", "provider": "paystack", "status": "succeeded", "createdAt": "2026-06-15T09:30:00.000Z" },
+    { "id": "pay_003", "kind": "convention", "fund": "building", "amountMinor": 8500, "currency": "USD", "provider": "flutterwave", "status": "failed", "createdAt": "2026-06-15T18:12:00.000Z" },
+    { "id": "pay_004", "kind": "donation", "fund": "welfare", "amountMinor": 2500, "currency": "NGN", "provider": "bank_transfer", "status": "pending", "createdAt": "2026-06-16T06:50:00.000Z" }
+  ],
+  "aiLogs": [
+    { "id": "ai_001", "kind": "chatbot", "summary": "Visitor asked for last Sunday's sermon notes; answered with citation to GS-PDF-0001.", "confidence": 0.91, "createdAt": "2026-06-15T16:00:00.000Z" },
+    { "id": "ai_002", "kind": "moderation", "summary": "Flagged a testimony wall submission for pastoral review before publishing.", "confidence": 0.77, "createdAt": "2026-06-15T19:22:00.000Z" },
+    { "id": "ai_003", "kind": "summary", "summary": "Generated sermon-to-devotional draft for 'The Power of Hope'.", "confidence": 0.88, "createdAt": "2026-06-21T13:05:00.000Z" }
+  ],
+  "auditLog": [
+    { "id": "aud_001", "actor": "admin@gracestream.org", "action": "approved_user", "target": "usr_006", "createdAt": "2026-06-14T08:47:00.000Z" },
+    { "id": "aud_002", "actor": "media@gracestream.org", "action": "published_media_job", "target": "job_001", "createdAt": "2026-06-21T13:10:00.000Z" }
+  ],
+  "analyticsSessions": [
+    { "sessionId": "sess_001", "user": "Returning member", "ipAddress": "82.14.x.x", "browser": "Chrome", "networkProvider": "BT Broadband", "deviceType": "desktop", "location": "Approx: London, UK", "pagesVisited": ["#home", "#archive", "#admin"], "totalSecondsSpent": 420, "accessCount": 5, "downloads": 2, "createdAt": "2026-06-16T08:00:00.000Z" },
+    { "sessionId": "sess_002", "user": "First-time visitor", "ipAddress": "41.58.x.x", "browser": "Safari", "networkProvider": "MTN", "deviceType": "mobile", "location": "Consent not given", "pagesVisited": ["#home", "#calendar"], "totalSecondsSpent": 180, "accessCount": 1, "downloads": 0, "createdAt": "2026-06-16T09:30:00.000Z" }
+  ],
+  "nextIds": { "user": 7, "approval": 4, "job": 4, "payment": 5, "ai": 4, "audit": 3, "session": 3 }
+}

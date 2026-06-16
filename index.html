@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GraceStream Church Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="glassCanvas" aria-hidden="true"></canvas>
+
+    <header class="shell-header">
+      <a class="brand" href="#home" aria-label="GraceStream home">
+        <span class="brand-mark">GS</span>
+        <span>
+          <strong>GraceStream</strong>
+          <small>Church Cloud</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="#live">Live</a>
+        <a href="#calendar">Calendar</a>
+        <a href="#search">Library</a>
+        <a href="#archive">Archive</a>
+        <a href="#registration">Register</a>
+        <a href="#admin">Admin</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#giving">Giving</a>
+      </nav>
+      <button class="primary-action" data-open="memberModal">Create Account</button>
+    </header>
+
+    <main id="home">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Scalable TypeScript architecture for modern ministry</p>
+          <h1>GraceStream Church Platform</h1>
+          <p>
+            A complete digital church experience for live worship, secure membership,
+            AI-assisted care, event registration, searchable documents, donations, and
+            automated media publishing.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#live">Open Live Console</a>
+            <a class="secondary-action" href="#registration">Convention Registration</a>
+          </div>
+        </div>
+        <aside class="hero-stats" aria-label="Platform highlights">
+          <div><strong>4</strong><span>active streams</span></div>
+          <div><strong>18k</strong><span>indexed resources</span></div>
+          <div><strong>99.95%</strong><span>target uptime</span></div>
+        </aside>
+      </section>
+
+      <section class="overview" aria-label="Feature overview">
+        <article>
+          <span class="icon">AI</span>
+          <h2>AI automation</h2>
+          <p>Route tasks, summarize services, answer questions, tag sermons, and trigger workflows through APIs.</p>
+        </article>
+        <article>
+          <span class="icon">ACL</span>
+          <h2>Access levels</h2>
+          <p>Member, worker, pastor, media team, finance, admin, and guest roles can be automated by rules.</p>
+        </article>
+        <article>
+          <span class="icon">API</span>
+          <h2>Integrations</h2>
+          <p>Payment gateways, Telegram, Slack, email, CRM, storage, streaming, analytics, and calendar APIs.</p>
+        </article>
+      </section>
+
+      <section id="live" class="workspace live-grid">
+        <div class="section-title">
+          <p class="eyebrow">Multi-stream media center</p>
+          <h2>Live Worship Console</h2>
+        </div>
+
+        <div class="player-panel">
+          <div class="player-topbar">
+            <span id="streamStatus">Main Sanctuary Live</span>
+            <div class="status-dot">ON AIR</div>
+          </div>
+          <div class="video-frame">
+            <div class="language-badge" id="languageBadge">EN Live</div>
+            <div class="resume-badge" id="resumeBadge">00:00 preserved</div>
+            <div class="subtitle" id="subtitleText">"Surely goodness and mercy shall follow me..."</div>
+            <button class="play-button" id="playToggle" aria-label="Play or pause">▶</button>
+            <div class="waveform" id="audioWave" aria-hidden="true"></div>
+          </div>
+          <div class="media-controls" aria-label="Media controls">
+            <label>
+              Quality
+              <select id="qualitySelect">
+                <option>Auto 4K</option>
+                <option>1080p</option>
+                <option>720p</option>
+                <option>480p</option>
+                <option>Audio only</option>
+              </select>
+            </label>
+            <label>
+              Mode
+              <select id="modeSelect">
+                <option>Video + Audio</option>
+                <option>Audio only</option>
+                <option>Low-data</option>
+              </select>
+            </label>
+            <label>
+              Language Stream
+              <select id="languageStreamSelect">
+                <option value="English" data-code="EN">English - Main Mix</option>
+                <option value="French" data-code="FR">French - Interpreter Feed</option>
+                <option value="Spanish" data-code="ES">Spanish - Interpreter Feed</option>
+                <option value="Portuguese" data-code="PT">Portuguese - Interpreter Feed</option>
+                <option value="Yoruba" data-code="YO">Yoruba - Local Language Feed</option>
+                <option value="Igbo" data-code="IG">Igbo - Local Language Feed</option>
+              </select>
+            </label>
+            <label>
+              Subtitles
+              <select id="subtitleSelect">
+                <option>English live captions</option>
+                <option>French</option>
+                <option>Spanish</option>
+                <option>Portuguese</option>
+                <option>Yoruba</option>
+                <option>Igbo</option>
+                <option>Off</option>
+              </select>
+            </label>
+            <button id="dvrBack">DVR -30s</button>
+            <button id="clipMoment">Create Clip</button>
+          </div>
+        </div>
+
+        <aside class="stream-list" aria-label="Available streams">
+          <button class="stream-card active" data-stream="Main Sanctuary">
+            <strong>Main Sanctuary</strong><span>4K worship + sermon</span>
+          </button>
+          <button class="stream-card" data-stream="Youth Chapel">
+            <strong>Youth Chapel</strong><span>1080p youth service</span>
+          </button>
+          <button class="stream-card" data-stream="Prayer Room">
+            <strong>Prayer Room</strong><span>Audio prayer line</span>
+          </button>
+          <button class="stream-card" data-stream="Overflow Hall">
+            <strong>Overflow Hall</strong><span>Low-latency relay</span>
+          </button>
+        </aside>
+
+        <div class="automation-panel">
+          <h3>Automatic Upload Pipeline</h3>
+          <ol id="pipelineSteps">
+            <li class="done">Detect service end</li>
+            <li class="done">Transcode video and audio</li>
+            <li class="active">Generate captions and sermon notes</li>
+            <li>Publish to calendar, app, podcast, and archive</li>
+            <li>Notify media team for approval</li>
+          </ol>
+          <button id="runPipeline">Run Upload Automation</button>
+        </div>
+      </section>
+
+      <section id="calendar" class="workspace calendar-layout">
+        <div class="calendar-appbar">
+          <div class="calendar-left">
+            <button id="calendarToday">Today</button>
+            <button class="icon-button" id="calendarPrev" aria-label="Previous month">‹</button>
+            <button class="icon-button" id="calendarNext" aria-label="Next month">›</button>
+            <div class="calendar-date-controls" aria-label="Calendar month and year">
+              <select id="calendarMonthSelect" aria-label="Select month"></select>
+              <input id="calendarYearInput" aria-label="Select year" type="number" min="2020" max="2035" value="2026" />
+            </div>
+          </div>
+          <div class="calendar-right" aria-label="Calendar tools">
+            <button class="icon-button" id="calendarNotes" aria-label="Calendar notes">▣</button>
+            <button class="icon-button" id="calendarSync" aria-label="Sync calendar">▦</button>
+            <button class="icon-button" id="calendarPrint" aria-label="Print calendar">▣</button>
+            <button id="calendarMode">Month ▾</button>
+          </div>
+        </div>
+        <div class="calendar-toolbar" aria-label="Calendar view filters">
+          <button class="active" data-calendar-view="all">30 Days</button>
+          <button data-calendar-view="past">Previous Events</button>
+          <button data-calendar-view="upcoming">Upcoming</button>
+        </div>
+        <div class="calendar-weekdays" aria-hidden="true">
+          <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+        </div>
+        <div class="calendar-board" id="calendarBoard" aria-label="Activities calendar"></div>
+        <div class="activity-detail" id="activityDetail"></div>
+      </section>
+
+      <section id="registration" class="workspace registration-layout">
+        <div class="section-title">
+          <p class="eyebrow">Smart onboarding</p>
+          <h2>Registration and Access</h2>
+        </div>
+        <form class="smart-form" id="memberForm">
+          <label>Full name<input required name="name" placeholder="Enter full name" /></label>
+          <label>Email<input required type="email" name="email" placeholder="name@example.com" /></label>
+          <label>Ministry interest
+            <select name="ministry">
+              <option>New member</option>
+              <option>Choir</option>
+              <option>Media team</option>
+              <option>Children ministry</option>
+              <option>Finance team</option>
+              <option>Pastoral care</option>
+            </select>
+          </label>
+          <label>Verification strength
+            <input type="range" min="1" max="5" value="4" name="trust" />
+          </label>
+          <button class="primary-action" type="submit">Evaluate Access</button>
+          <output id="accessOutput">AI will recommend role, next step, and approval channel.</output>
+        </form>
+        <form class="smart-form accent" id="conventionForm">
+          <h3>Convention Registration</h3>
+          <label>Attendee name<input required name="attendee" placeholder="Guest or family name" /></label>
+          <label>Package
+            <select name="package">
+              <option>Standard seat</option>
+              <option>Family pass</option>
+              <option>Volunteer pass</option>
+              <option>VIP ministry partner</option>
+            </select>
+          </label>
+          <label>Needs
+            <textarea name="needs" placeholder="Transport, accommodation, interpretation, childcare"></textarea>
+          </label>
+          <button type="submit">Reserve Place</button>
+          <output id="conventionOutput">Interactive allocation is ready.</output>
+        </form>
+      </section>
+
+      <section id="search" class="workspace search-layout">
+        <div class="section-title">
+          <p class="eyebrow">Knowledge retrieval</p>
+          <h2>Power Search Engine</h2>
+        </div>
+        <div class="search-box">
+          <input id="searchInput" placeholder="Search by name, date, serial number, preacher, resource ID, quote, or keyword..." />
+          <button id="searchButton">Search</button>
+        </div>
+        <div class="search-filters" aria-label="Advanced search filters">
+          <label>File type
+            <select id="searchType">
+              <option value="all">All files</option>
+              <option value="VIDEO">Video</option>
+              <option value="AUDIO">Audio</option>
+              <option value="PDF">PDF</option>
+              <option value="EPUB">EPUB</option>
+              <option value="PHOTO">Photos</option>
+            </select>
+          </label>
+          <label>Date
+            <input id="searchDate" type="date" />
+          </label>
+          <label>Preacher
+            <select id="searchPreacher">
+              <option value="all">Any preacher</option>
+              <option>Pastor Daniel Reed</option>
+              <option>Rev. Miriam Stone</option>
+              <option>Pastor Luis Ortega</option>
+              <option>Dr. Naomi Hart</option>
+            </select>
+          </label>
+          <label>Search mode
+            <select id="searchMode">
+              <option value="all">Metadata + document contents</option>
+              <option value="metadata">Metadata only</option>
+              <option value="inside">Inside PDF/EPUB only</option>
+            </select>
+          </label>
+        </div>
+        <div class="search-intelligence">
+          <span>Name</span><span>Date</span><span>Serial No.</span><span>Preacher</span><span>Resource ID</span><span>Archive bundles</span><span>PDF/EPUB quotes</span>
+        </div>
+        <div class="result-list" id="resultList"></div>
+      </section>
+
+      <section id="archive" class="workspace archive-layout">
+        <div class="section-title">
+          <p class="eyebrow">Media and document archive</p>
+          <h2>Archive Page</h2>
+        </div>
+        <div class="archive-toolbar" aria-label="Archive filters">
+          <button class="active" data-archive-filter="all">All Bundles</button>
+          <button data-archive-filter="services">Services</button>
+          <button data-archive-filter="convention">Convention</button>
+          <button data-archive-filter="training">Training</button>
+          <button data-archive-filter="devotionals">Devotionals</button>
+        </div>
+        <div class="archive-search-box">
+          <input id="archiveSearchInput" placeholder="Search archive by title, date, preacher, serial number, bundle ID, video, audio, PDF, or EPUB..." />
+          <button id="archiveSearchButton">Search Archive</button>
+        </div>
+        <div class="archive-feature" id="archiveFeature">
+          <span class="file-badge">4-IN-1</span>
+          <div>
+            <h3>Sunday Service: The Power of Hope</h3>
+            <p>Every archive file is stored as a complete package with video replay, audio-only version, PDF notes, and EPUB reading edition.</p>
+          </div>
+          <button>Open Bundle</button>
+        </div>
+        <div class="archive-grid" id="archiveGrid" aria-label="Archived resources"></div>
+      </section>
+
+      <section class="workspace approvals-layout">
+        <div class="section-title">
+          <p class="eyebrow">Approval intelligence</p>
+          <h2>Automated User Approval</h2>
+        </div>
+        <div class="approval-card">
+          <h3>Pending: Media Team Access</h3>
+          <p>Risk: low. Verified email, church department match, two existing sponsors, completed onboarding.</p>
+          <div class="channel-row">
+            <button data-channel="Telegram">Telegram</button>
+            <button data-channel="Slack">Slack</button>
+            <button data-channel="Email">Email</button>
+          </div>
+          <output id="approvalOutput">Choose an approval channel.</output>
+        </div>
+        <div class="integration-map">
+          <span>OpenAI</span><span>Stripe/Paystack</span><span>Cloudflare Stream</span><span>Slack</span>
+          <span>Telegram</span><span>SendGrid</span><span>S3/R2</span><span>PostgreSQL</span>
+        </div>
+      </section>
+
+      <section id="admin" class="workspace admin-portal">
+        <div class="section-title">
+          <p class="eyebrow">Secure operations center</p>
+          <h2>Admin Portal</h2>
+        </div>
+
+        <aside class="admin-sidebar" aria-label="Admin sections">
+          <button class="active" data-admin-tab="overview">Overview</button>
+          <button data-admin-tab="users">Users and Access</button>
+          <button data-admin-tab="media">Media Uploads</button>
+          <button data-admin-tab="archive">Archive Bundles</button>
+          <button data-admin-tab="payments">Payments</button>
+          <button data-admin-tab="ai">AI Automation</button>
+        </aside>
+
+        <div class="admin-main">
+          <div class="admin-metrics" aria-label="Admin metrics">
+            <article><strong>248</strong><span>members pending review</span></article>
+            <article><strong>12</strong><span>media jobs running</span></article>
+            <article><strong>4</strong><span>live stream rooms</span></article>
+            <article><strong>$18.4k</strong><span>monthly giving tracked</span></article>
+          </div>
+
+          <div class="admin-panel" id="adminPanel">
+            <div>
+              <p class="eyebrow">Overview</p>
+              <h3>Today’s Control Room</h3>
+              <p>Monitor registrations, approve access, publish media, manage archive bundles, review giving, and supervise AI workflows from one protected portal.</p>
+            </div>
+            <div class="admin-actions">
+              <button data-admin-action="Approve verified members">Approve Members</button>
+              <button data-admin-action="Publish completed media jobs">Publish Media</button>
+              <button data-admin-action="Sync payment and donation records">Sync Payments</button>
+              <button data-admin-action="Run AI health check">AI Health Check</button>
+            </div>
+            <output id="adminOutput">Admin activity log is ready.</output>
+          </div>
+
+          <div class="admin-table" aria-label="Admin work queue">
+            <div class="admin-row admin-row-head">
+              <span>Queue</span><span>Status</span><span>Owner</span><span>Action</span>
+            </div>
+            <div class="admin-row">
+              <span>Media Team Access</span><span>Low risk</span><span>Membership Desk</span><button data-admin-action="Reviewed media access request">Review</button>
+            </div>
+            <div class="admin-row">
+              <span>Sunday Replay Bundle</span><span>Captions ready</span><span>Media Desk</span><button data-admin-action="Published Sunday Replay Bundle">Publish</button>
+            </div>
+            <div class="admin-row">
+              <span>Convention Registrations</span><span>86% capacity</span><span>Events Team</span><button data-admin-action="Opened convention dashboard">Open</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="analytics" class="workspace analytics-page">
+        <div class="section-title">
+          <p class="eyebrow">AI visitor intelligence</p>
+          <h2>AI Analytics Center</h2>
+        </div>
+
+        <div class="analytics-toolbar">
+          <button id="analyticsRefresh">Refresh Session</button>
+          <button id="analyticsLocation">Request Location Consent</button>
+          <button id="analyticsExport">Export Report</button>
+        </div>
+
+        <div class="analytics-metrics" aria-label="Analytics metrics">
+          <article><span>Active users</span><strong id="metricActiveUsers">128</strong></article>
+          <article><span>Avg. time</span><strong id="metricAvgTime">07:42</strong></article>
+          <article><span>Downloads</span><strong id="metricDownloads">36</strong></article>
+          <article><span>Return visits</span><strong id="metricReturns">4.8x</strong></article>
+        </div>
+
+        <div class="analytics-grid">
+          <article class="analytics-panel">
+            <h3>Current Visitor Signal</h3>
+            <div class="signal-list" id="visitorSignals"></div>
+            <p class="privacy-note">IP, network provider, and precise location should be collected only with lawful basis, consent where required, retention limits, and admin audit logs.</p>
+          </article>
+
+          <article class="analytics-panel">
+            <h3>Pages Visited</h3>
+            <div class="journey-list" id="pageJourney"></div>
+          </article>
+
+          <article class="analytics-panel">
+            <h3>AI Insights</h3>
+            <div class="insight-list" id="aiInsights"></div>
+          </article>
+
+          <article class="analytics-panel">
+            <h3>Downloads and Events</h3>
+            <div class="download-list" id="downloadEvents"></div>
+          </article>
+        </div>
+
+        <article class="analytics-panel analytics-matrix-panel">
+          <h3>User Analytics Matrix</h3>
+          <div class="user-matrix" id="userAnalyticsMatrix" aria-label="User analytics matrix"></div>
+        </article>
+      </section>
+
+      <section id="giving" class="workspace giving-layout">
+        <div class="section-title">
+          <p class="eyebrow">Secure generosity</p>
+          <h2>Donation and Payments</h2>
+        </div>
+        <form class="giving-form" id="givingForm">
+          <div class="amount-grid">
+            <button type="button" data-amount="25">$25</button>
+            <button type="button" data-amount="50">$50</button>
+            <button type="button" data-amount="100">$100</button>
+            <button type="button" data-amount="250">$250</button>
+          </div>
+          <label>Custom amount<input id="donationAmount" type="number" min="1" value="100" /></label>
+          <label>Fund
+            <select>
+              <option>Tithe</option>
+              <option>Offering</option>
+              <option>Missions</option>
+              <option>Building project</option>
+              <option>Welfare</option>
+            </select>
+          </label>
+          <button class="primary-action" type="submit">Continue to Payment</button>
+          <output id="givingOutput">Payment provider can be Stripe, Paystack, Flutterwave, or bank transfer.</output>
+        </form>
+        <div class="standout">
+          <h3>Ideas that make it stand out</h3>
+          <p>AI sermon highlights, family check-in, prayer request triage, volunteer scheduling, multilingual live captions, ministry analytics, testimony wall, attendance heatmaps, and follow-up journeys for first-time visitors.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="chatbot" aria-label="AI website assistant">
+      <div class="chat-header">
+        <strong>Grace AI</strong>
+        <span>Navigation + support</span>
+      </div>
+      <div class="chat-log" id="chatLog">
+        <p><strong>Grace AI:</strong> Ask me to find sermons, register for convention, donate, or explain access levels.</p>
+      </div>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" placeholder="Ask the church assistant..." />
+        <button aria-label="Send">↗</button>
+      </form>
+    </aside>
+
+    <dialog id="memberModal">
+      <form method="dialog" class="modal-card">
+        <button class="close" value="close" aria-label="Close">×</button>
+        <h2>Create Member Account</h2>
+        <p>Production flow: email/phone verification, identity confidence, ministry rules, sponsor checks, and automated approval.</p>
+        <label>Email<input type="email" placeholder="member@example.com" /></label>
+        <label>Desired access
+          <select>
+            <option>Member</option>
+            <option>Worker</option>
+            <option>Media Team</option>
+            <option>Pastor</option>
+            <option>Finance</option>
+          </select>
+        </label>
+        <button class="primary-action" value="close">Start Registration</button>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
